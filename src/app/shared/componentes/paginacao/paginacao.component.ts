@@ -3,7 +3,8 @@ import {
 	Input, 
 	OnInit, 
 	Output, 
-	EventEmitter 
+	EventEmitter, 
+	AfterViewInit
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
@@ -11,7 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 	selector: 'tabela-paginacao',
 	templateUrl: 'paginacao.component.html',
 })
-export class PaginacaoComponent implements OnInit {
+export class PaginacaoComponent implements OnInit, AfterViewInit {
 	public static readonly TOTAL_PAGS_PADRAO: number = 20;
 	public static readonly PAG_PADRAO: number = 1;
 	public static readonly REG_PADRAO: number = 0;
@@ -29,26 +30,27 @@ export class PaginacaoComponent implements OnInit {
 
 	constructor(private route: ActivatedRoute) {
 	}
-
+	
 	ngOnInit() {
 		this.qtdAdjacentes = this.qtdAdjacentes || PaginacaoComponent.ADJACENTES_PADRAO;
 		this.qtdPorPagina = this.qtdPorPagina || PaginacaoComponent.TOTAL_PAGS_PADRAO;
 		this.pagina = +this.route.snapshot.queryParams['pagina'] || PaginacaoComponent.PAG_PADRAO;
 		this.totalRegistros = this.totalRegistros || PaginacaoComponent.REG_PADRAO;
-		this.qtdPaginas = Math.ceil(this.totalRegistros / this.qtdPorPagina);
+	}
+	ngAfterViewInit(): void {
 		this.gerarLinks();
 	}
-
+	
 	/**
 	 * Gera os links de paginação.
 	 */
 	gerarLinks() {
+		this.qtdPaginas = Math.ceil(this.totalRegistros / this.qtdPorPagina);
 		this.exibirProximo = this.qtdPaginas !== this.pagina;
 		this.paginas = [];
-		let iniAdjacente = (this.pagina - this.qtdAdjacentes <= 0) ? 1 : 
-				(this.pagina - this.qtdAdjacentes);
-		let fimAdjacente = (this.pagina + this.qtdAdjacentes >= this.qtdPaginas) ? 
-				this.qtdPaginas : (this.pagina + this.qtdAdjacentes);
+		let iniAdjacente = (this.pagina - this.qtdAdjacentes <= 0)               ?  1                : (this.pagina - this.qtdAdjacentes);
+		let fimAdjacente = (this.pagina + this.qtdAdjacentes >= this.qtdPaginas) ? 	this.qtdPaginas  : (this.pagina + this.qtdAdjacentes);
+
 		for (let i=iniAdjacente; i<=fimAdjacente; i++) {
 			this.paginas.push(i);
 		}
